@@ -16,7 +16,7 @@ export class AppComponent {
     this.options = this.FormBuilder.group({
       hideRequired: [''],
       finalValue: ['', Validators.required],
-      postCode: ['', [ Validators.required, Validators.pattern('[0-9]{5}')]]
+      postCode: ['', [ Validators.required, Validators.pattern('[0-9]{5}'), Validators.maxLength(5), Validators.minLength(5)]]
     });
   }
 }
