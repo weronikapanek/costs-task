@@ -1,0 +1,17 @@
+<div class="example-container">
+  <form [formGroup]="options">
+    <mat-form-field appearance="fill">
+      <input [formControl]="postCode" matInput placeholder="Postcode">
+    <div *ngIf="options.get('postCode').hasError('required')" >
+            Please enter valid value
+          </div>
+    <div *ngIf="options.get('postCode').hasError('pattern')">
+      Please write post code with 5 characters</div>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <input formControlName="finalValue" matInput placeholder="finalValue">
+      
+    </mat-form-field>
+    <mat-checkbox formControlName="hideRequiredControl">Long product</mat-checkbox>
+  </form>
+</div>
