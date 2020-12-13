@@ -1,7 +1,7 @@
 <div class="example-container">
   <form [formGroup]="options">
     <mat-form-field appearance="fill">
-      <input [formControl]="postCode" matInput placeholder="Postcode">
+      <input formControlName="postCode" matInput placeholder="Postcode">
     <div *ngIf="options.get('postCode').hasError('required')" >
             Please enter valid value
           </div>
@@ -9,8 +9,30 @@
       Please write post code with 5 characters</div>
     </mat-form-field>
     <mat-form-field appearance="fill">
-      <input formControlName="finalValue" matInput placeholder="finalValue">
-      
+      <input formControlName="finalValue" matInput placeholder="Total order amount">
+      <div *ngIf="options.get('finalValue').hasError('required')" >
+            Please enter valid value
+          </div>
+    <div *ngIf="options.get('finalValue').hasError('pattern')">
+      Only numbers required</div>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <input type="file" #csvReader name="Upload CSV" id="txtFileUpload" (change)="uploadListener($event)" accept=".csv" />    
+<table class="minimalistBlack" *ngIf="records.length > 0">    
+  <thead>    
+    <tr>    
+      <th>ID </th>    
+      <th>Mobile </th>    
+    </tr>    
+  </thead>    
+  <tbody>    
+    <tr *ngFor="let record of records;let i = index;">    
+      <td> <span>{{record.id}}</span> </td>     
+      <td> <span>{{record.mobile}}</span> </td>    
+    </tr>    
+  </tbody>    
+</table>      
+
     </mat-form-field>
     <mat-checkbox formControlName="hideRequiredControl">Long product</mat-checkbox>
   </form>
