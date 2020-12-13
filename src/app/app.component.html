@@ -1,5 +1,5 @@
 <div class="example-container">
-  <form [formGroup]="options">
+  <form [formGroup]="options" (ngSubmit)="onSubmit">
     <mat-form-field appearance="fill">
       <input formControlName="postCode" matInput placeholder="Postcode">
     <div *ngIf="options.get('postCode').hasError('required')" >
@@ -16,13 +16,16 @@
     <div *ngIf="options.get('finalValue').hasError('pattern')">
       Only numbers required</div>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-checkbox formControlName="hideRequiredControl">Long product</mat-checkbox>
+      
+<div> Total delivery cost: </div>
+<button>Count delivery value:</button>
       <input type="file" #csvReader name="Upload CSV" id="txtFileUpload" (change)="uploadListener($event)" accept=".csv" />    
 <table class="minimalistBlack" *ngIf="records.length > 0">    
   <thead>    
     <tr>    
-      <th>ID </th>    
-      <th>Mobile </th>    
+      <th>First 2 post code digits </th>    
+      <th>Delivery price </th>    
     </tr>    
   </thead>    
   <tbody>    
@@ -31,9 +34,6 @@
       <td> <span>{{record.mobile}}</span> </td>    
     </tr>    
   </tbody>    
-</table>      
-
-    </mat-form-field>
-    <mat-checkbox formControlName="hideRequiredControl">Long product</mat-checkbox>
+</table>     
   </form>
 </div>

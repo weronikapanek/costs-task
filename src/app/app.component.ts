@@ -67,12 +67,15 @@ export class AppComponent {
       if (curruntRecord.length == headerLength) {  
         let csvRecord: CSVRecord = new CSVRecord();  
         csvRecord.id = curruntRecord[0].trim();  
-        csvRecord.mobile = curruntRecord[5].trim();  
+        csvRecord.mobile = curruntRecord[1].trim();  
         csvArr.push(csvRecord);  
       }  
     }  
+    console.log(csvArr);
     return csvArr;  
   }  
+
+  
   
   isValidCSVFile(file: any) {  
     return file.name.endsWith(".csv");  
@@ -91,4 +94,8 @@ export class AppComponent {
     this.csvReader.nativeElement.value = "";  
     this.records = [];  
   }  
+  
+  onSubmit () {
+    console.log(this.options.value)
+  }
 }
