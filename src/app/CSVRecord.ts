@@ -1,4 +1,9 @@
 export class CSVRecord {  
-    public id: string;  
-    public mobile: string;     
+  constructor(id: string, price: string) {
+    this.id = id;
+    this.price = price;
   }
+    
+  public id: string;  
+  public price: string;     
+}

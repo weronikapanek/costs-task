@@ -1,39 +1,68 @@
 <div class="example-container">
-  <form [formGroup]="options" (ngSubmit)="onSubmit">
+  <form [formGroup]="shippingPriceForm" (ngSubmit)="onSubmit()">
     <mat-form-field appearance="fill">
-      <input formControlName="postCode" matInput placeholder="Postcode">
-    <div *ngIf="options.get('postCode').hasError('required')" >
-            Please enter valid value
-          </div>
-    <div *ngIf="options.get('postCode').hasError('pattern')">
-      Please write post code with 5 characters</div>
+      <input formControlName="postCode" matInput placeholder="Postcode" />
+      <div
+        *ngIf="
+          shippingPriceForm.get('postCode').touched &&
+          shippingPriceForm.get('postCode').hasError('required')
+        "
+      >
+        Postcode is required.
+      </div>
+      <div *ngIf="shippingPriceForm.get('postCode').hasError('pattern')">
+        Postcode must be a 5-digit number.
+      </div>
     </mat-form-field>
+
     <mat-form-field appearance="fill">
-      <input formControlName="finalValue" matInput placeholder="Total order amount">
-      <div *ngIf="options.get('finalValue').hasError('required')" >
-            Please enter valid value
-          </div>
-    <div *ngIf="options.get('finalValue').hasError('pattern')">
-      Only numbers required</div>
+      <input
+        formControlName="totalOrderAmount"
+        type="number"
+        matInput
+        placeholder="Total order amount"
+      />
+      <div
+        *ngIf="shippingPriceForm.get('totalOrderAmount').hasError('pattern')"
+      >
+        Only integer numbers allowed
+      </div>
     </mat-form-field>
-    <mat-checkbox formControlName="hideRequiredControl">Long product</mat-checkbox>
-      
-<div> Total delivery cost: </div>
-<button>Count delivery value:</button>
-      <input type="file" #csvReader name="Upload CSV" id="txtFileUpload" (change)="uploadListener($event)" (onClick)="getDataRecordsArrayFromCSVFile" accept=".csv"/>    
-<table class="minimalistBlack" *ngIf="records.length > 0">    
-  <thead>    
-    <tr>    
-      <th>First 2 post code digits </th>    
-      <th>Delivery price </th>    
-    </tr>    
-  </thead>    
-  <tbody>    
-    <tr *ngFor="let record of records;let i = index;">    
-      <td> <span>{{record.id}}</span> </td>     
-      <td> <span>{{record.mobile}}</span> </td>    
-    </tr>    
-  </tbody>    
-</table>     
+
+    <mat-checkbox formControlName="longProductFlag">
+      Long product
+    </mat-checkbox>
+
+    <div>Please import .csv file with zones delivery prices:</div>
+    <input
+      type="file"
+      #csvReader
+      name="Upload CSV"
+      id="txtFileUpload"
+      (change)="uploadListener($event)"
+      accept=".csv"
+      formControlName="file"
+    />
+    <div
+      *ngIf="
+        shippingPriceForm.get('file').touched &&
+        shippingPriceForm.get('file').hasError('required')
+      "
+    >
+      File is required.
+    </div>
+    <div *ngIf="shippingPriceForm.get('file').hasError('pattern')">
+      File must be a .csv format.
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="shippingPriceForm.pristine || shippingPriceForm.invalid"
+    >
+      Count delivery value
+    </button>
   </form>
+  <div *ngIf="totalShippingCost">
+    Total shipping cost: {{ totalShippingCost }} $
+  </div>
 </div>

@@ -1,6 +1,5 @@
-import { ViewChild } from '@angular/core';
-import { Component } from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, PatternValidator, Validators} from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CSVRecord } from './CSVRecord';
 
 @Component({
@@ -11,27 +10,24 @@ import { CSVRecord } from './CSVRecord';
 
 
 export class AppComponent {
-  title = 'form';
-  options: FormGroup;
+  shippingPriceForm: FormGroup;
+  csvRecords: any[] = [];  
+  totalShippingCost: number;
 
-  constructor(private FormBuilder: FormBuilder) { }
+  @ViewChild('csvReader') csvReader: any;  
 
-  ngOnInit() {
-    this.options = this.FormBuilder.group({
-      hideRequired: [''],
-      finalValue: ['', [ Validators.required, Validators.pattern('[0-9]'),]],
-      postCode: ['', [ Validators.required, Validators.pattern('[0-9]{5}'), Validators.maxLength(5), Validators.minLength(5)]],
-      file: new FormControl('', [Validators.required]),
-      fileSource: new FormControl('', [Validators.required])
+  constructor(private formBuilder: FormBuilder) { }
+
+  ngOnInit(): void {
+    this.shippingPriceForm = this.formBuilder.group({
+      postCode: ['', [Validators.required, Validators.pattern('[0-9]{5}')]],
+      totalOrderAmount: [0, [Validators.pattern('^[0-9]*$'),]],   
+      longProductFlag: [''], 
+      file: ['', [Validators.required, Validators.pattern('.*\.csv$')]],
     });
   }
   
-  public records: any[] = [];  
-  @ViewChild('csvReader') csvReader: any;  
-  
   uploadListener($event: any): void {  
-  
-    let text = [];  
     let files = $event.srcElement.files;  
   
     if (this.isValidCSVFile(files[0])) {  
@@ -43,10 +39,9 @@ export class AppComponent {
       reader.onload = () => {  
         let csvData = reader.result;  
         let csvRecordsArray = (<string>csvData).split(/\r\n|\n/);  
-  
         let headersRow = this.getHeaderArray(csvRecordsArray);  
   
-        this.records = this.getDataRecordsArrayFromCSVFile(csvRecordsArray, headersRow.length);  
+        this.csvRecords = this.getRecordsFromCSVFile(csvRecordsArray, headersRow.length);  
       };  
   
       reader.onerror = function () {  
@@ -54,48 +49,72 @@ export class AppComponent {
       };  
   
     } else {  
-      alert("Please import valid .csv file.");  
       this.fileReset();  
     }  
   }  
   
-  getDataRecordsArrayFromCSVFile(csvRecordsArray: any, headerLength: any) {  
-    let csvArr = [];  
+  onSubmit(): void {
+    this.totalShippingCost = this.countTotalShippingCost();
+  }
+
+  private countTotalShippingCost(): number {
+    let totalShippingCost: number = this.shippingPriceForm.get('totalOrderAmount').value;
+
+    if(this.csvRecords) {
+      const postCode = this.shippingPriceForm.get('postCode').value;
+      const record: CSVRecord = this.csvRecords.find((c: CSVRecord) => c.id === postCode.substring(0,2));
+
+      if(record) {
+        totalShippingCost += Number(record.price);
+      } else {
+        alert("Provided .csv file doesn not contain entered postcode. Zone price cost will be count as 0.");  
+      }
+    }
+
+    if(this.shippingPriceForm.get('longProductFlag').value) {
+      totalShippingCost += 1995;
+    }
+
+    if(this.shippingPriceForm.get('totalOrderAmount').value > 12500) {
+      totalShippingCost = 0.95*totalShippingCost;
+    }
+
+    return totalShippingCost;
+  }
+
+  private getRecordsFromCSVFile(csvRecordsArray: any, headerLength: any): CSVRecord[] {  
+    let csvArr: CSVRecord[] = [];  
   
     for (let i = 1; i < csvRecordsArray.length; i++) {  
-      let curruntRecord = (<string>csvRecordsArray[i]).split(',');  
-      if (curruntRecord.length == headerLength) {  
-        let csvRecord: CSVRecord = new CSVRecord();  
-        csvRecord.id = curruntRecord[0].trim();  
-        csvRecord.mobile = curruntRecord[1].trim();  
+      let currentRecord = (<string>csvRecordsArray[i]).split(','); 
+
+      if (currentRecord.length == headerLength) {  
+        const csvRecord = new CSVRecord(currentRecord[0].trim(), currentRecord[1].trim());  
+
         csvArr.push(csvRecord);  
       }  
     }  
-    console.log(csvArr);
+
     return csvArr;  
   }  
 
-  
-  
-  isValidCSVFile(file: any) {  
-    return file.name.endsWith(".csv");  
-  }  
-  
-  getHeaderArray(csvRecordsArr: any) {  
+  private getHeaderArray(csvRecordsArr: any): string[] {  
     let headers = (<string>csvRecordsArr[0]).split(',');  
-    let headerArray = [];  
+    let headerArray: string[] = []; 
+
     for (let j = 0; j < headers.length; j++) {  
       headerArray.push(headers[j]);  
     }  
+
     return headerArray;  
   }  
-  
-  fileReset() {  
-    this.csvReader.nativeElement.value = "";  
-    this.records = [];  
+
+  private isValidCSVFile(file: any): boolean {  
+    return file.name.endsWith(".csv");  
   }  
-  
-  onSubmit () {
-    console.log(this.options.value)
-  }
+
+  private fileReset(): void {  
+    this.csvReader.nativeElement.value = "";  
+    this.csvRecords = [];  
+  }  
 }
