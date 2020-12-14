@@ -20,7 +20,7 @@
       
 <div> Total delivery cost: </div>
 <button>Count delivery value:</button>
-      <input type="file" #csvReader name="Upload CSV" id="txtFileUpload" (change)="uploadListener($event)" accept=".csv" />    
+      <input type="file" #csvReader name="Upload CSV" id="txtFileUpload" (change)="uploadListener($event)" (onClick)="getDataRecordsArrayFromCSVFile" accept=".csv"/>    
 <table class="minimalistBlack" *ngIf="records.length > 0">    
   <thead>    
     <tr>    
